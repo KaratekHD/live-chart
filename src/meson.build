@@ -52,9 +52,10 @@ livechart_lib = library(
     [sources],
     dependencies: deps,
     vala_args: vala_args,
+    vala_gir: 'LiveChart-1.10.gir',
     version: meson.project_version(),
     install: true,
-    install_dir: [true, true, true]
+    install_dir: [true, true, true, true]
 )
 
 pkg = import('pkgconfig')
@@ -71,3 +72,16 @@ livechart_dep = declare_dependency(
     dependencies: deps,
     include_directories: [include_directories('.')]
 )
+
+gir_file = meson.current_build_dir() / 'LiveChart-1.10.gir'
+
+g_ir_compiler = find_program('g-ir-compiler')
+
+typelib = custom_target('LiveChart typelib',
+  input: gir_file,
+  output: 'LiveChart-1.10.typelib',
+  command: [g_ir_compiler, '--output=@OUTPUT@', '@INPUT@'],
+  install: true,
+  install_dir: get_option('libdir') / 'girepository-1.0',
+  depends: livechart_lib
+  )
